@@ -5,10 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfFromDeepseek"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Погода" Height="300" Width="400">
     <StackPanel>
-        <Button Click="Button_Click" Margin="10">Определить погоду</Button>
-        <TextBlock x:Name="WeatherText" Margin="10"/>
-        <ProgressBar x:Name="WeatherProgress" IsIndeterminate="True" Visibility="Collapsed"/>
+        <Button Content="Определить погоду" 
+                Command="{Binding GetWeatherCommand}"
+                Margin="10" Padding="5"/>
+        <TextBlock Text="{Binding WeatherInfo}"
+                   Margin="10" TextWrapping="Wrap"/>
     </StackPanel>
 </Window>

@@ -4,6 +4,7 @@ using System.Data;
 using System.Net.Http;
 using System.Windows;
 using WpfFromDeepseek.Services;
+using WpfFromDeepseek.ViewModels;
 
 namespace WpfFromDeepseek {
     /// <summary>
@@ -13,14 +14,18 @@ namespace WpfFromDeepseek {
         protected override void OnStartup(StartupEventArgs e) {
             var services = new ServiceCollection();
             services.AddSingleton<HttpClient>();
+
             services.AddTransient<IWeatherService, WeatherService>();
-            services.AddTransient<MainWindow>();
+
+            services.AddTransient<WeatherViewModel>();
+
+            services.AddTransient<MainWindow>(provider => {
+                var viewModel = provider.GetRequiredService<WeatherViewModel>();
+                return new MainWindow { DataContext = viewModel };
+            });
 
             var provider = services.BuildServiceProvider();
-            var mainWindow = provider.GetRequiredService<MainWindow>();
-            mainWindow.Show();
-
-            base.OnStartup(e);
+            provider.GetRequiredService<MainWindow>().Show();
         }
     }
 
