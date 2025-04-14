@@ -37,8 +37,8 @@ namespace WpfFromDeepseek.ViewModels {
         private async Task LoadWeather() {
             try {
                 var weather = await _weatherService.GetWeatherAsync(CityName);
-                WeatherInfo = $"Город: {weather.Name}\n" +
-                    $"Температура: {weather.Main.Temp}°C\n" +
+                WeatherInfo = $"Город: {weather.CityName}\n" +
+                    $"Температура: {weather.Main.Temperature}°C\n" +
                     $"Влажность: {weather.Main.Humidity}%";
             }
             catch (Exception ex) {

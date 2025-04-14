@@ -1,41 +1,45 @@
-﻿using System;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using WpfFromDeepseek.Data;
+using WpfFromDeepseek.Data.Entities;
 using WpfFromDeepseek.Models;
 
 namespace WpfFromDeepseek.Services {
     public class WeatherService : IWeatherService {
         private readonly HttpClient _httpClient;
-        public WeatherService(HttpClient httpClient) => _httpClient = httpClient;
+        private readonly AppDbContext _db;
+        private readonly string _apiKey;
+        public WeatherService(IConfiguration config, HttpClient httpClient, AppDbContext db) {
+            _apiKey = config["WeatherApi:ApiKey"];
+            _httpClient = httpClient;
+            _db = db;
+        }
 
         public async Task<WeatherData> GetWeatherAsync(string city) {
-            string apiKey = "dad0e53d811dad3fee317cc0d2b7c045";
-            string url = $"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={apiKey}&units=metric&lang=ru";
-            try {
-                var response = await _httpClient.GetAsync(url);
-                response.EnsureSuccessStatusCode();
+            string url = $"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={_apiKey}&units=metric&lang=ru";
 
-                string json = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<WeatherData>(json) ?? throw new Exception("Не удалось распознать данные");
+            var response = await _httpClient.GetAsync(url);
+            response.EnsureSuccessStatusCode();
 
-                if (string.IsNullOrEmpty(result.Name))
-                    result.Name = city;
+            string json = await response.Content.ReadAsStringAsync();
+            var data = JsonSerializer.Deserialize<WeatherData>(json)!;
 
-                return result;
-            }
-            catch (Exception) {
-                return new WeatherData {
-                    Name = city,
-                    Main = new WeatherData.Maindata {
-                        Temp = 0,
-                        Humidity = 0
-                    }
-                };
-            }
+            await _db.WeatherRecords.AddAsync(new WeatherRecord {
+                CityName = data.CityName,
+                Temperature = data.Main.Temperature,
+                Humidity = data.Main.Humidity
+            });
+
+            await _db.SaveChangesAsync();
+
+            return data;
+
         }
     }
 }
