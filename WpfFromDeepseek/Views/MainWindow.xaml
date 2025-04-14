@@ -1,16 +1,28 @@
-﻿<Window x:Class="WpfFromDeepseek.MainWindow"
+<Window x:Class="WpfFromDeepseek.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfFromDeepseek"
         mc:Ignorable="d"
-        Title="Погода" Height="300" Width="400">
-    <StackPanel>
-        <Button Content="Определить погоду" 
-                Command="{Binding GetWeatherCommand}"
-                Margin="10" Padding="5"/>
+        Title="Погода" SizeToContent="WidthAndHeight">
+    <StackPanel Margin="10">
+        <TextBox Text="{Binding CityName, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="0,0,0,10"/>
+        <Button Command="{Binding GetWeatherCommand}"
+                Padding="10, 5">
+            <Button.Style>
+                <Style TargetType="Button">
+                    <Setter Property="Content" Value="Определить погоду"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsLoading}" Value="true">
+                            <Setter Property="Content" Value="Is Loading..."/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
         <TextBlock Text="{Binding WeatherInfo}"
-                   Margin="10" TextWrapping="Wrap"/>
+                   Margin="0, 10" TextWrapping="Wrap"/>
     </StackPanel>
 </Window>
