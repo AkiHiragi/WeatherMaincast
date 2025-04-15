@@ -28,10 +28,12 @@ namespace WpfFromDeepseek.ViewModels {
             LoadHistory();
         }
         private async void LoadHistory() {
-            Records = new ObservableCollection<WeatherRecord>(
+            var history = new ObservableCollection<WeatherRecord>(
                 await _db.WeatherRecords
                 .OrderByDescending(r => r.RequestTime)
                 .ToListAsync());
+
+            Records = new ObservableCollection<WeatherRecord>(history);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

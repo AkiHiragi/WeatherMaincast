@@ -7,8 +7,10 @@ using System.IO;
 using System.Net.Http;
 using System.Windows;
 using WpfFromDeepseek.Data;
+using WpfFromDeepseek.Navigation;
 using WpfFromDeepseek.Services;
 using WpfFromDeepseek.ViewModels;
+using WpfFromDeepseek.Views;
 
 namespace WpfFromDeepseek {
     /// <summary>
@@ -25,6 +27,7 @@ namespace WpfFromDeepseek {
             var services = new ServiceCollection();
 
             services.AddSingleton<IConfiguration>(config);
+            services.AddSingleton<INavigationService,NavigationService>();
 
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(config.GetConnectionString("Default")));
@@ -32,6 +35,13 @@ namespace WpfFromDeepseek {
             services.AddSingleton<HttpClient>();
             services.AddTransient<IWeatherService, WeatherService>();
             services.AddTransient<WeatherViewModel>();
+
+            services.AddTransient<HistoryViewModel>();
+
+            services.AddTransient<HistoryWindow>(provider => {
+                var vm = provider.GetRequiredService<HistoryViewModel>();
+                return new HistoryWindow { DataContext = vm };
+            });
 
             services.AddTransient<MainWindow>(provider => {
                 var db = provider.GetRequiredService<AppDbContext>();

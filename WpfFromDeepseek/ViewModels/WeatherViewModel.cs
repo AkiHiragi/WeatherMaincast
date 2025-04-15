@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,7 +7,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using WpfFromDeepseek.Navigation;
 using WpfFromDeepseek.Services;
+using WpfFromDeepseek.Views;
 
 namespace WpfFromDeepseek.ViewModels {
     public class WeatherViewModel : INotifyPropertyChanged {
@@ -24,14 +27,21 @@ namespace WpfFromDeepseek.ViewModels {
             set { _cityName = value; OnPropertyChanged(); }
         }
 
+        public ICommand ShowHistoryCommand { get; }
+
         public ICommand GetWeatherCommand { get; }
 
-        public WeatherViewModel(IWeatherService weatherService) {
+        public WeatherViewModel(IWeatherService weatherService, INavigationService navigation) {
             _weatherService = weatherService;
+
             GetWeatherCommand = new RelayCommand(
                 execute: async () => await LoadWeather(),
                 canExecute: CanLoadWeather
-                );
+            );
+
+            ShowHistoryCommand = new RelayCommand(() => {
+                navigation.ShowWindow<HistoryWindow>();
+            });
         }
 
         private async Task LoadWeather() {

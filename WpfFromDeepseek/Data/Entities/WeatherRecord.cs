@@ -14,6 +14,6 @@ namespace WpfFromDeepseek.Data.Entities {
         public DateTime RequestTime { get; set; }
 
         [NotMapped]
-        public string Summary => $"{CityName}: {Temperature}°C, {Humidity}% at {RequestTime:g}";
+        public string FormatedDate => RequestTime.ToLocalTime().ToString("g");
     }
 }

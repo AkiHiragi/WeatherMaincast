@@ -15,14 +15,16 @@ namespace WpfFromDeepseek.Services {
         private readonly HttpClient _httpClient;
         private readonly AppDbContext _db;
         private readonly string _apiKey;
+        private readonly string _baseUrl;
         public WeatherService(IConfiguration config, HttpClient httpClient, AppDbContext db) {
             _apiKey = config["WeatherApi:ApiKey"];
+            _baseUrl = config["WeatherApi:BaseUrl"];
             _httpClient = httpClient;
             _db = db;
         }
 
         public async Task<WeatherData> GetWeatherAsync(string city) {
-            string url = $"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={_apiKey}&units=metric&lang=ru";
+            string url = $"{_baseUrl}?q={city}&appid={_apiKey}&units=metric&lang=ru";
 
             var response = await _httpClient.GetAsync(url);
             response.EnsureSuccessStatusCode();
@@ -33,7 +35,8 @@ namespace WpfFromDeepseek.Services {
             await _db.WeatherRecords.AddAsync(new WeatherRecord {
                 CityName = data.CityName,
                 Temperature = data.Main.Temperature,
-                Humidity = data.Main.Humidity
+                Humidity = data.Main.Humidity,
+                RequestTime = DateTime.UtcNow
             });
 
             await _db.SaveChangesAsync();
